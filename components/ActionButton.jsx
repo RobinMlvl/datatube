@@ -2,10 +2,12 @@
 
 import { useState, useTransition } from "react";
 
-export default function ActionButton({ action, label, pendingLabel = "Working…", variant = "secondary" }) {
+const VARIANT = { primary: "btn-primary", secondary: "btn-secondary", destructive: "btn-destructive" };
+
+// icon is an optional lucide component rendered before the label.
+export default function ActionButton({ action, label, pendingLabel = "Working…", variant = "secondary", icon: Icon }) {
   const [pending, start] = useTransition();
   const [error, setError] = useState(null);
-  const style = variant === "primary" ? "bg-neutral-900 text-white" : "border border-neutral-300 bg-white hover:bg-neutral-50";
   const run = () => start(async () => {
     setError(null);
     const result = await action();
@@ -13,10 +15,11 @@ export default function ActionButton({ action, label, pendingLabel = "Working…
   });
   return (
     <span className="inline-flex flex-wrap items-center gap-2">
-      <button type="button" disabled={pending} onClick={run} className={`rounded-md px-3 py-1.5 text-sm disabled:opacity-50 ${style}`}>
+      <button type="button" disabled={pending} onClick={run} className={`btn ${VARIANT[variant] ?? VARIANT.secondary}`}>
+        {Icon && <Icon aria-hidden="true" />}
         {pending ? pendingLabel : label}
       </button>
-      {error && <span className="text-sm text-red-700">{error}</span>}
+      {error && <span role="alert" className="text-[13px] text-negative">{error}</span>}
     </span>
   );
 }

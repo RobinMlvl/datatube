@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { lineSeconds } from "@/lib/youtube/timestamps.mjs";
+import { Search } from "lucide-react";
+import { formatTimestamp, lineSeconds } from "@/lib/youtube/timestamps.mjs";
 import Markdown from "./Markdown";
 
 export default function VideoWorkspace({ videoId, summary, transcript }) {
@@ -9,7 +10,11 @@ export default function VideoWorkspace({ videoId, summary, transcript }) {
   const [tab, setTab] = useState(summary ? "sheet" : "transcript");
   const [filter, setFilter] = useState("");
   const lines = useMemo(
-    () => (transcript ?? "").split("\n").filter(Boolean).map((line) => ({ line, s: lineSeconds(line) })),
+    () => (transcript ?? "").split("\n").filter(Boolean).map((line) => ({
+      line,
+      s: lineSeconds(line),
+      words: line.replace(/^\[[^\]]*\]\s*/, ""),
+    })),
     [transcript],
   );
   const needle = filter.trim().toLowerCase();
@@ -22,9 +27,9 @@ export default function VideoWorkspace({ videoId, summary, transcript }) {
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div className="lg:sticky lg:top-6 lg:self-start">
-        <div className="aspect-video overflow-hidden rounded-lg bg-black">
+        <div className="aspect-video overflow-hidden rounded-xl bg-black">
           <iframe
             ref={frame}
             src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1`}
@@ -36,29 +41,59 @@ export default function VideoWorkspace({ videoId, summary, transcript }) {
         </div>
       </div>
       <div className="min-w-0">
-        <div className="flex gap-2 border-b border-neutral-200">
+        <div role="tablist" aria-label="Video content" className="segmented">
           {[["sheet", "Sheet"], ["transcript", "Transcript"]].map(([key, label]) => (
-            <button key={key} type="button" onClick={() => setTab(key)} className={`-mb-px border-b-2 px-3 py-2 text-sm ${tab === key ? "border-neutral-900 font-medium" : "border-transparent text-neutral-500"}`}>
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              id={`tab-${key}`}
+              aria-selected={tab === key}
+              aria-controls={`panel-${key}`}
+              onClick={() => setTab(key)}
+              className="segment"
+            >
               {label}
             </button>
           ))}
         </div>
-        {tab === "sheet" && (summary
-          ? <div className="mt-4"><Markdown markdown={summary} onSeek={seek} /></div>
-          : <p className="mt-4 text-sm text-neutral-500">No sheet yet.</p>)}
+        {tab === "sheet" && (
+          <div id="panel-sheet" role="tabpanel" aria-labelledby="tab-sheet" className="mt-4">
+            {summary
+              ? <div className="card p-5 md:p-6"><Markdown markdown={summary} onSeek={seek} /></div>
+              : <p className="subhead">No sheet yet.</p>}
+          </div>
+        )}
         {tab === "transcript" && (
-          <div className="mt-4">
-            <input type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Find in the transcript" className="w-full rounded-md border border-neutral-300 px-3 py-1.5 text-sm" />
+          <div id="panel-transcript" role="tabpanel" aria-labelledby="tab-transcript" className="mt-4">
+            <div className="relative">
+              <Search aria-hidden="true" className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-label-3" />
+              <input
+                type="search"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                placeholder="Find in the transcript"
+                aria-label="Find in the transcript"
+                className="field w-full pl-8"
+              />
+            </div>
             {lines.length === 0 ? (
-              <p className="mt-4 text-sm text-neutral-500">No transcript yet.</p>
+              <p className="subhead mt-3">No transcript yet.</p>
             ) : (
-              <ul className="mt-3 max-h-[70vh] space-y-0.5 overflow-y-auto text-sm">
-                {shown.map(({ line, s }, i) => (
-                  <li key={i}>
-                    <button type="button" disabled={s == null} onClick={() => seek(s)} className="w-full rounded px-2 py-1 text-left hover:bg-neutral-100">{line}</button>
-                  </li>
+              <div className="card rows mt-3 max-h-[70vh] overflow-y-auto">
+                {shown.map(({ line, s, words }, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    disabled={s == null}
+                    onClick={() => seek(s)}
+                    className="flex w-full gap-3 px-4 py-2 text-left hover:bg-fill/60"
+                  >
+                    <span className="w-14 shrink-0 font-mono text-[12px] tabular-nums text-accent">{s != null ? formatTimestamp(s) : ""}</span>
+                    <span className="text-[14px]">{words}</span>
+                  </button>
                 ))}
-              </ul>
+              </div>
             )}
           </div>
         )}

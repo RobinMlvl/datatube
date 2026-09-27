@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Check, Copy } from "lucide-react";
 
 export default function CopyButton({ text, label = "Copy Markdown" }) {
   const [copied, setCopied] = useState(false);
@@ -10,7 +11,8 @@ export default function CopyButton({ text, label = "Copy Markdown" }) {
     setTimeout(() => setCopied(false), 1500);
   };
   return (
-    <button type="button" onClick={copy} className="rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm hover:bg-neutral-50">
+    <button type="button" onClick={copy} className="btn btn-secondary">
+      {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
       {copied ? "Copied" : label}
     </button>
   );
