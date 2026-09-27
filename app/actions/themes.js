@@ -24,7 +24,7 @@ export async function regenerateThemeSheetAction(themeId) {
       path: theme.path, videos: themeVideosWithSummaries(db, id), model: deepseekModel, themeId: id,
       complete: (args) => deepseek({ ...args, themeId: id }),
     });
-    saveThemeSheet(db, id, markdown, deepseekModel, Date.now());
+    saveThemeSheet(db, id, markdown, deepseekModel, Date.now(), { seenChanges: theme.changesSinceSheet });
     revalidatePath("/", "layout");
     return { ok: true };
   } catch (err) {
