@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import { Clock, Search } from "lucide-react";
 import AutoRefresh from "@/components/AutoRefresh";
 import ImportForm from "@/components/ImportForm";
 import VideosTable from "@/components/VideosTable";
@@ -26,28 +27,45 @@ export default async function LibraryPage({ searchParams }) {
     return qs ? `/?${qs}` : "/";
   };
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-5xl">
       <AutoRefresh active={queue.pendingJobs > 0} />
-      <h1 className="text-2xl font-semibold tracking-tight">Library</h1>
-      <p className="mt-1 text-sm text-neutral-500">{counts.total} videos · {counts.active} in progress · {counts.review} to review · {counts.failed} failed</p>
+      <h1 className="large-title">Library</h1>
+      <p className="subhead mt-1 tabular-nums">
+        {counts.total} videos · {counts.active} in progress · {counts.review} to review · {counts.failed} failed
+      </p>
       <ImportForm />
       {queue.pausedUntil && (
-        <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          YouTube is limiting requests. Fetching resumes at {new Date(queue.pausedUntil).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}; summaries keep going.
-        </p>
+        <div className="notice notice-caution mt-4">
+          <Clock className="h-4 w-4 shrink-0 text-caution" />
+          <p>
+            YouTube is limiting requests. Fetching resumes at{" "}
+            {new Date(queue.pausedUntil).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}; summaries keep going.
+          </p>
+        </div>
       )}
-      <div className="mt-8 flex flex-wrap items-center gap-2">
-        {FILTERS.map(([label, s]) => (
-          <Link key={label} href={href(s)} className={`rounded-full border px-3 py-1 text-sm ${state === s ? "border-neutral-900 bg-neutral-900 text-white" : "border-neutral-300 hover:bg-neutral-100"}`}>
-            {label}
-          </Link>
-        ))}
-        <form action="/" className="w-full sm:ml-auto sm:w-auto">
+      <div className="mt-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="max-w-full overflow-x-auto">
+          <div className="segmented">
+            {FILTERS.map(([label, s]) => (
+              <Link key={label} href={href(s)} aria-current={state === s ? "page" : undefined} className="segment">
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+        <form action="/" className="relative w-full md:w-72">
           {state && <input type="hidden" name="state" value={state} />}
-          <input type="search" name="q" defaultValue={q} placeholder="Search titles, sheets, transcripts" className="w-full rounded-md border border-neutral-300 px-3 py-1.5 text-sm sm:w-72" />
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-label-3" />
+          <input
+            type="search" name="q" defaultValue={q} placeholder="Search"
+            aria-label="Search titles, sheets and transcripts"
+            className="field w-full pl-8"
+          />
         </form>
       </div>
-      <VideosTable videos={videos} />
+      <div className="mt-6">
+        <VideosTable videos={videos} />
+      </div>
     </div>
   );
 }
