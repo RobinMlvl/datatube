@@ -15,17 +15,17 @@ const at = new Date(now).toISOString();
 const SHEET = (title) => `# ${title}
 **Channel:** Demo Channel · **Duration:** 12:34 · **Language:** en · **Published:** 2026-04-12 · **Link:** https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
-## 🎯 Core idea
-Trade the break of a well-defined range, with the stop under the range.
-## 📊 Chapters
-- \`00:00–01:35\` **Intro** — why ranges matter
-- \`01:35–12:34\` **The setup** — entry, stop, target
-## 💡 Key points
-- Wait for a candle to close outside the range — [01:05] "wait for the candle to close above resistance"
-- The stop goes under the range low — [03:10] "your stop goes just under the range"
-## 🛠️ In practice
-- Mark the range on the 1-hour chart — [02:00] "mark the range on the one hour"
-- Enter on the close, target 2R — [04:20] "take profit at two R"
+## 📝 Summary
+A range-breakout method: mark a clear range on the 1-hour chart, wait for a candle to close outside it, enter on that close with the stop just under the range and take profit at 2R.
+## 🎯 Key takeaways
+- Only trade a well-defined range with several touches on both sides.
+- A wick through the range is not a breakout; only a close counts.
+- The stop goes just under the range low, so a failed breakout costs one R.
+## 🛠️ Method
+1. Mark the range on the 1-hour chart.
+2. Wait for a candle to close above resistance.
+3. Enter on that close; stop just under the range low.
+4. Take profit at 2R.
 `;
 
 const videos = [
@@ -53,13 +53,15 @@ db.prepare("UPDATE Video SET themeSource = 'proposed', proposedTheme = ?, classi
   .run(JSON.stringify({ name: "Scalping", parent: "Trading" }));
 saveThemeSheet(db, breakout.id, `# Trading › Breakout Strategy
 
-## 🎯 What this theme is about
-Trading the break of a range.
-## 💡 Consolidated knowledge
-### Entry
-- Wait for the close outside the range — [Breakout strategy explained · 01:05]
-## 🛠️ In practice
-- Stop under the range low — [Stop placement for breakouts · 03:10]
+## 📝 Summary
+Trading the break of a range: wait for a close outside it, stop under the range, fixed 2R target.
+## 🎯 Key takeaways
+- Only a candle close outside the range confirms a breakout.
+- The stop sits just under the range low.
+## 🛠️ Method
+1. Mark the range on the 1-hour chart.
+2. Enter on the close outside the range.
+3. Stop under the range low; take profit at 2R.
 ## ⚠️ Disagreements between videos
 Not in the videos
 

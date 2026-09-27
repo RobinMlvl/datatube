@@ -188,3 +188,24 @@ Installation : `claude mcp add datatube -- node ~/Documents/Business/DataTube/mc
 - La synchronisation automatique d'une chaîne (importer ses nouvelles vidéos).
 - L'édition manuelle d'une feuille.
 - Plusieurs utilisateurs, une authentification, un déploiement cloud.
+
+## 10. Décision du 27/09 après la première preuve réelle : la fiche devient une fiche de révision
+
+Constat sur les premières vraies vidéos : une vidéo d'1 h produisait une fiche de 92 000 à 110 000 caractères, plus longue que le transcript lui-même. En cause : une citation mot pour mot (plus sa traduction) sur chaque point, et des sections qui se répétaient.
+
+Robin a tranché : **juste la data, condensée, ni citation ni horodatage.** Cette section remplace le format du §5.3, la règle « chaque point cite `[MM:SS] "exact text"` » du §2 et le format du §5.5.
+
+- **Fiche vidéo :** `# titre` et la ligne de métadonnées (écrites par le code), puis trois sections :
+  - `## 📝 Summary` : 3 à 5 phrases (sujet, méthode ou argument, conclusion) ;
+  - `## 🎯 Key takeaways` : 3 à 8 puces, les faits et idées à retenir ;
+  - `## 🛠️ Method` : les étapes et règles numérotées, avec les chiffres, réglages et conditions exacts.
+  - Objectif : moins de 400 mots, jusqu'à 800 pour une vidéo longue et dense.
+- **Règles qui restent :**
+  - le transcript est la seule source ;
+  - aucune connaissance extérieure, aucune spéculation ;
+  - une section vide dit `Not in the video` ;
+  - la sortie est en anglais ;
+  - seule la donnée utile est gardée (faits, règles, chiffres, réglages, conditions, définitions, étapes) ; anecdotes, auto-promotion et remplissage sont retirés.
+- **Vidéos longues :** les notes de chaque bloc sont des lignes de data. La fusion dédoublonne.
+- **Feuille de thème :** `## 📝 Summary`, `## 🎯 Key takeaways`, `## 🛠️ Method`, puis `## ⚠️ Disagreements between videos`, où les vidéos sont nommées par leur titre ; `## 📚 Sources` est écrite par le code. Objectif : moins de 800 mots.
+- **Ce qui change pour la vérifiabilité :** un point ne renvoie plus à son passage. Le transcript horodaté reste consultable (onglet Transcript, outil MCP `get_transcript`).

@@ -20,5 +20,5 @@ Original method (read-only): docs/reference/ytquest/
 - Secrets live in `.env.local` only — never printed, logged, stored or sent to the browser.
 - Tests (vitest) never touch the network, yt-dlp or the real clock: inject `now` (ms).
 - Dates are UTC ISO strings in the database.
-- The sheet rules are the product: the transcript is the only source, every point carries `[MM:SS] "exact words"`, an empty section says `Not in the video`. Never weaken them.
+- The sheet rules are the product: a sheet is a revision sheet — only useful data, condensed (Summary, Key takeaways, Method), no quotes, no timestamps; the transcript is the only source, no outside knowledge; an empty section says `Not in the video`. Never weaken them.
 - The MCP server writes nothing to stdout but the protocol: log with `console.error`.

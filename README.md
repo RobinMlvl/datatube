@@ -2,7 +2,7 @@
 
 A local library of knowledge sheets built from YouTube videos.
 
-Paste videos, playlists or channels. DataTube fetches each transcript (yt-dlp), writes a sheet (DeepSeek) where every point is cited as `[MM:SS] "exact words"`, sorts the video into a theme (Jev), and merges a theme's videos into one consolidated sheet. Export any sheet as Markdown, or let Claude Code read the library through the MCP server.
+Paste videos, playlists or channels. DataTube fetches each transcript (yt-dlp), writes a condensed revision sheet (DeepSeek) — a short summary, the key takeaways and the method, from the transcript only — sorts the video into a theme (Jev), and merges a theme's videos into one consolidated sheet. Export any sheet as Markdown, or let Claude Code read the library through the MCP server.
 
 ## Setup (once)
 
