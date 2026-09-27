@@ -21,7 +21,7 @@ Elle vient du profil Hermes **ytquest** (VPS Dewex), copié tel quel dans `docs/
 - **Les règles anti-hallucination du SOUL :**
   - le transcript est la seule source ;
   - toute affirmation cite le texte et son horodatage `[MM:SS]` ;
-  - une info absente s'écrit « pas dans la vidéo », jamais une reformulation approximative ;
+  - une info absente s'écrit « Not in the video », jamais une reformulation approximative ;
   - aucune connaissance extérieure, aucune spéculation sur ce que l'orateur « voulait dire ».
 - **Le parseur VTT** (`scripts/parse_vtt.py`). Dans les sous-titres auto de YouTube, le texte propre est porté par les segments d'une frame (moins de 0,02 s). On retire les balises de mots et on dédoublonne les lignes consécutives. Il est porté en JS.
 - **Le découpage des longs transcripts :** au-delà de 50K caractères, blocs de 40K avec 2K de chevauchement, un résumé par bloc, puis une fusion.
@@ -36,6 +36,7 @@ Ce qu'on laisse : les cookies, le solveur JS distant, le bridge iPhone et Tor. T
 | Unité de la feuille | **Par vidéo ET par thème** : une feuille par vidéo, et une feuille consolidée par thème |
 | Classement | **L'IA propose, Robin corrige** |
 | Contenu d'une feuille | **Résumé générique** (le format ytquest), le même pour toutes les vidéos, sans gabarit par domaine |
+| Langue | **Tout en anglais** : l'interface ET les feuilles, quelle que soit la langue de la vidéo |
 | Modèles | **DeepSeek écrit, Jev classe.** DeepSeek : résumés, feuilles de thème, nom d'un nouveau thème. Jev (TypeSafe System One) : le choix du thème, avec sa confiance. Jev ne génère jamais de texte, il répond par des probabilités calibrées. |
 | Sortie vers une IA | **Export Markdown + serveur MCP local** |
 | Import | **Liens, playlists et chaînes** |
@@ -57,7 +58,7 @@ Ce qu'on laisse : les cookies, le solveur JS distant, le bridge iPhone et Tor. T
   `npm run dev` lance `web` et `worker` ensemble.
 - **Secrets :** `DEEPSEEK_API_KEY` et `TYPESAFE_API_KEY` dans `.env.local`, qui n'est jamais commité. Une clé n'est jamais écrite en base, dans un log ou dans une page.
 - **Outils système :** `yt-dlp` et `deno` (le runtime JS dont yt-dlp a besoin pour YouTube), installés avec `brew install yt-dlp deno`. Settings vérifie qu'ils sont là et donne la commande sinon.
-- **Langue :** le texte de l'interface est en anglais (convention de Robin), les feuilles sont en français, le code et les commits en anglais.
+- **Langue :** tout est en anglais — l'interface, les feuilles (résumés et feuilles de thème), le code et les commits.
 
 ### Données
 
@@ -101,20 +102,20 @@ Les états d'une `Video` : `queued` → `fetching` → `summarizing` → `classi
 
 ### 5.3 Résumé (`summarize`, DeepSeek)
 - Le modèle est un Setting, `deepseek-v4-flash` par défaut. Le « thinking » est forcé à off (piège DeepSeek V4, cf. Dewex).
-- Le prompt reprend les règles du §2. La sortie est en français, quelle que soit la langue de la vidéo.
+- Le prompt reprend les règles du §2. La sortie est en anglais, quelle que soit la langue de la vidéo ; les citations `[MM:SS]` gardent le texte exact dans la langue d'origine, suivi de sa traduction anglaise quand la vidéo n'est pas en anglais.
 - **Format fixe :**
   - `# <titre>` ;
   - une ligne de métadonnées : chaîne, durée, langue, date, lien ;
-  - `## 🎯 Idée centrale` ;
-  - `## 📊 Chapitres` : plages horodatées, en suivant les chapitres YouTube quand ils existent ;
-  - `## 💡 Points clés` : chaque point porte sa citation `[MM:SS] « texte exact »` ;
-  - `## 🛠️ Mise en pratique` : ce que la vidéo dit de faire, sinon « pas dans la vidéo ».
+  - `## 🎯 Core idea` ;
+  - `## 📊 Chapters` : plages horodatées, en suivant les chapitres YouTube quand ils existent ;
+  - `## 💡 Key points` : chaque point porte sa citation `[MM:SS] "exact text"` ;
+  - `## 🛠️ In practice` : ce que la vidéo dit de faire, sinon « Not in the video ».
 - Transcript de plus de 50K caractères : les notes de chaque bloc de 40K (2K de chevauchement), puis une passe de fusion au même format.
 - Chaque appel écrit une ligne `ApiCall`, dont le coût est calculé en micro-USD entiers depuis une table de prix dans le code.
 
 ### 5.4 Classement (`classify`, Jev puis DeepSeek)
 - **Jev** (`jev-1.13.0`, `POST https://api.typesafe.ai/v1/systemone`) reçoit :
-  - l'état : titre, chaîne et idée centrale + points clés du résumé ;
+  - l'état : titre, chaîne, et « Core idea » + « Key points » du résumé ;
   - une question `choice` : les thèmes existants (« Parent › Enfant ») + « None of these ».
 - Si le thème gagnant n'est pas « None » et que sa confiance atteint le seuil (Setting, 600/1000 par défaut), la vidéo y est rangée avec `themeSource = auto`.
 - Sinon, **DeepSeek** propose un thème (nom + parent éventuel) à partir du résumé et de la liste des thèmes. La vidéo passe en `themeSource = proposed` et apparaît dans **Review**.
@@ -126,7 +127,7 @@ Les états d'une `Video` : `queued` → `fetching` → `summarizing` → `classi
 - La page du thème affiche « Sheet out of date: N changes since ».
 - DeepSeek fusionne les résumés des vidéos du thème en une feuille consolidée :
   - chaque point cite `[Titre de la vidéo · MM:SS]` ;
-  - une section `## ⚠️ Désaccords entre vidéos` liste les contradictions au lieu de les lisser ;
+  - une section `## ⚠️ Disagreements between videos` liste les contradictions au lieu de les lisser ;
   - aucune connaissance extérieure.
 - Un thème trop gros pour un seul appel est fusionné par paquets de résumés, puis en une passe finale.
 
