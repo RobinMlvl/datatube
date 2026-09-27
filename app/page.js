@@ -1,69 +1,53 @@
-import Image from "next/image";
+import Link from "next/link";
+import { connection } from "next/server";
+import AutoRefresh from "@/components/AutoRefresh";
+import ImportForm from "@/components/ImportForm";
+import VideosTable from "@/components/VideosTable";
+import { getDb } from "@/lib/db.mjs";
+import { libraryCounts, listVideos, queueStatus } from "@/lib/queries.mjs";
 
-export default function Home() {
+const FILTERS = [["All", null], ["In progress", "active"], ["Done", "done"], ["To review", "review"], ["No transcript", "no_transcript"], ["Failed", "failed"]];
+
+export default async function LibraryPage({ searchParams }) {
+  await connection();
+  const sp = await searchParams;
+  const db = getDb();
+  const state = typeof sp.state === "string" ? sp.state : null;
+  const q = typeof sp.q === "string" ? sp.q : "";
+  const videos = listVideos(db, { state, q });
+  const counts = libraryCounts(db);
+  // eslint-disable-next-line react-hooks/purity -- Server Component rendered at request time, after connection()
+  const queue = queueStatus(db, Date.now());
+  const href = (s) => {
+    const p = new URLSearchParams();
+    if (s) p.set("state", s);
+    if (q) p.set("q", q);
+    const qs = p.toString();
+    return qs ? `/?${qs}` : "/";
+  };
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.js
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="mx-auto max-w-6xl">
+      <AutoRefresh active={queue.pendingJobs > 0} />
+      <h1 className="text-2xl font-semibold tracking-tight">Library</h1>
+      <p className="mt-1 text-sm text-neutral-500">{counts.total} videos · {counts.active} in progress · {counts.review} to review · {counts.failed} failed</p>
+      <ImportForm />
+      {queue.pausedUntil && (
+        <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          YouTube is limiting requests. Fetching resumes at {new Date(queue.pausedUntil).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}; summaries keep going.
+        </p>
+      )}
+      <div className="mt-8 flex flex-wrap items-center gap-2">
+        {FILTERS.map(([label, s]) => (
+          <Link key={label} href={href(s)} className={`rounded-full border px-3 py-1 text-sm ${state === s ? "border-neutral-900 bg-neutral-900 text-white" : "border-neutral-300 hover:bg-neutral-100"}`}>
+            {label}
+          </Link>
+        ))}
+        <form action="/" className="w-full sm:ml-auto sm:w-auto">
+          {state && <input type="hidden" name="state" value={state} />}
+          <input type="search" name="q" defaultValue={q} placeholder="Search titles, sheets, transcripts" className="w-full rounded-md border border-neutral-300 px-3 py-1.5 text-sm sm:w-72" />
+        </form>
+      </div>
+      <VideosTable videos={videos} />
     </div>
   );
 }

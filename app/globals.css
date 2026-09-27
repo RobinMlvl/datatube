@@ -1,26 +1,15 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+/* The knowledge sheets, rendered from Markdown (no typography plugin). */
+.sheet { line-height: 1.6; font-size: 0.95rem; }
+.sheet h1 { font-size: 1.35rem; font-weight: 600; margin: 0.25rem 0; }
+.sheet h2 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
+.sheet h3 { font-weight: 600; margin: 1rem 0 0.25rem; }
+.sheet p { margin: 0.5rem 0; }
+.sheet ul, .sheet ol { padding-left: 1.25rem; margin: 0.5rem 0; }
+.sheet ul { list-style: disc; }
+.sheet ol { list-style: decimal; }
+.sheet li { margin: 0.25rem 0; }
+.sheet code { font-size: 0.85em; background: #f4f4f5; padding: 0.05rem 0.3rem; border-radius: 0.25rem; }
+.sheet table { border-collapse: collapse; margin: 0.75rem 0; font-size: 0.9rem; }
+.sheet th, .sheet td { border: 1px solid #e5e5e5; padding: 0.25rem 0.5rem; text-align: left; }
