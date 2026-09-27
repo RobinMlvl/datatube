@@ -2,6 +2,7 @@ import path from "node:path";
 import Link from "next/link";
 import { connection } from "next/server";
 import CopyButton from "@/components/CopyButton";
+import ListRow from "@/components/ListRow";
 import SettingsForm from "@/components/SettingsForm";
 import { costTotals, formatUsd } from "@/lib/costs.mjs";
 import { getDb } from "@/lib/db.mjs";
@@ -11,18 +12,6 @@ import { checkTools } from "@/lib/youtube/ytdlp.mjs";
 
 function SectionHeading({ children }) {
   return <p className="eyebrow mb-2 px-1">{children}</p>;
-}
-
-function Row({ label, helper, children }) {
-  return (
-    <div className="flex items-center justify-between gap-4 px-4 py-3">
-      <div>
-        <p className="text-[14px]">{label}</p>
-        {helper && <p className="subhead">{helper}</p>}
-      </div>
-      <div>{children}</div>
-    </div>
-  );
 }
 
 export default async function SettingsPage() {
@@ -54,9 +43,9 @@ export default async function SettingsPage() {
         <SectionHeading>API keys</SectionHeading>
         <div className="card rows">
           {keys.map(([label, env, set]) => (
-            <Row key={env} label={label} helper={!set ? `Add ${env} to .env.local, then restart npm run dev` : null}>
+            <ListRow key={env} label={label} helper={!set ? `Add ${env} to .env.local, then restart npm run dev` : null}>
               {set ? <span className="status status-done">Set</span> : <span className="status status-negative">Missing</span>}
-            </Row>
+            </ListRow>
           ))}
         </div>
       </section>
@@ -64,24 +53,24 @@ export default async function SettingsPage() {
       <section className="mt-8">
         <SectionHeading>Tools</SectionHeading>
         <div className="card rows">
-          <Row label="yt-dlp" helper={!tools.ytDlp ? <span className="font-mono">brew install yt-dlp deno</span> : null}>
+          <ListRow label="yt-dlp" helper={!tools.ytDlp ? <span className="font-mono">brew install yt-dlp deno</span> : null}>
             {tools.ytDlp ? <span className="font-mono text-[13px] text-label-2">{tools.ytDlp}</span> : <span className="status status-negative">Missing</span>}
-          </Row>
-          <Row label="deno" helper={!tools.deno ? <span className="font-mono">brew install yt-dlp deno</span> : null}>
+          </ListRow>
+          <ListRow label="deno" helper={!tools.deno ? <span className="font-mono">brew install yt-dlp deno</span> : null}>
             {tools.deno ? <span className="font-mono text-[13px] text-label-2">{tools.deno}</span> : <span className="status status-negative">Missing</span>}
-          </Row>
+          </ListRow>
         </div>
       </section>
 
       <section className="mt-8">
         <SectionHeading>Spend</SectionHeading>
         <div className="card rows">
-          <Row label="This month">
+          <ListRow label="This month">
             <span className="text-[14px] tabular-nums">{formatUsd(costs.sinceMicrousd)}</span>
-          </Row>
-          <Row label="All time">
+          </ListRow>
+          <ListRow label="All time">
             <span className="text-[14px] tabular-nums">{formatUsd(costs.allMicrousd)}</span>
-          </Row>
+          </ListRow>
           <div className="px-4 py-3">
             <Link href="/spend" className="btn btn-plain -ml-2">See all spending</Link>
           </div>

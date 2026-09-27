@@ -6,7 +6,7 @@ import { formatUsd } from "@/lib/costs.mjs";
 
 export default function BudgetBanner({ budget }) {
   if (budget.level === "none" || budget.level === "ok") return null;
-  const percent = Math.round(budget.usedPermille / 10);
+  const percent = Math.floor(budget.usedPermille / 10); // never "100%" before the cap is actually reached
   const spent = formatUsd(budget.spentMicrousd);
   const total = formatUsd(budget.budgetMicrousd);
   const resets = new Date(budget.resetsAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });

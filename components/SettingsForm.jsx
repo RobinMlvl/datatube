@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { Check } from "lucide-react";
 import { saveSettingsAction } from "@/app/actions/settings";
+import { formatAmount } from "@/lib/costs.mjs";
 
 export default function SettingsForm({ models, settings }) {
   const [state, formAction, pending] = useActionState(saveSettingsAction, null);
@@ -48,7 +49,7 @@ export default function SettingsForm({ models, settings }) {
             type="text"
             inputMode="decimal"
             name="monthlyBudget"
-            defaultValue={settings.monthlyBudgetMicrousd != null ? settings.monthlyBudgetMicrousd / 1_000_000 : ""}
+            defaultValue={formatAmount(settings.monthlyBudgetMicrousd)}
             className="field w-28 text-right tabular-nums"
           />
         </span>

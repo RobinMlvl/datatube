@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import BudgetBanner from "@/components/BudgetBanner";
+import ListRow from "@/components/ListRow";
 import SpendBars from "@/components/SpendBars";
 import { budgetStatus } from "@/lib/budget.mjs";
-import { formatUsd, formatUsdPrecise } from "@/lib/costs.mjs";
+import { formatAmount, formatUsd, formatUsdPrecise } from "@/lib/costs.mjs";
 import { getDb } from "@/lib/db.mjs";
 import { fetchDeepseekBalance } from "@/lib/llm/deepseek.mjs";
 import {
@@ -35,9 +36,6 @@ const formatCallTime = (isoString) => {
   return `${d.toLocaleDateString("en-US", { month: "short", day: "numeric" })}, ${d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false })}`;
 };
 const formatTokens = (n) => (n == null ? "—" : n.toLocaleString("en-US"));
-// A non-USD balance has no recorded costs to compare against — shown as-is, no reconciliation.
-const formatOtherCurrency = (totalMicro) =>
-  (totalMicro / 1_000_000).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 function SectionEyebrow({ children }) {
   return <p className="eyebrow mb-2 px-1">{children}</p>;
@@ -45,18 +43,6 @@ function SectionEyebrow({ children }) {
 
 function SectionTitle({ children }) {
   return <p className="title-2 mb-3">{children}</p>;
-}
-
-function Row({ label, helper, children }) {
-  return (
-    <div className="flex items-center justify-between gap-4 px-4 py-3">
-      <div>
-        <p className="text-[14px]">{label}</p>
-        {helper && <p className="subhead">{helper}</p>}
-      </div>
-      <div>{children}</div>
-    </div>
-  );
 }
 
 async function readDeepseekBalance(db, now) {
@@ -134,33 +120,30 @@ export default async function SpendPage() {
         <SectionEyebrow>DeepSeek account</SectionEyebrow>
         <div className="card rows">
           {deepseek.kind === "no_key" && (
-            <Row label="Balance"><span className="subhead">Add DEEPSEEK_API_KEY to .env.local to read the balance.</span></Row>
+            <ListRow label="Balance"><span className="subhead">Add DEEPSEEK_API_KEY to .env.local to read the balance.</span></ListRow>
           )}
           {deepseek.kind === "error" && (
-            <Row label="Balance"><span className="subhead">Could not read the balance — {deepseek.message}</span></Row>
+            <ListRow label="Balance"><span className="subhead">Could not read the balance — {deepseek.message}</span></ListRow>
           )}
           {deepseek.kind === "other" && (
-            <Row label="Balance"><span className="text-[14px] tabular-nums">{formatOtherCurrency(deepseek.totalMicro)} {deepseek.currency}</span></Row>
+            <ListRow label="Balance"><span className="text-[14px] tabular-nums">{formatAmount(deepseek.totalMicro)} {deepseek.currency}</span></ListRow>
           )}
           {deepseek.kind === "usd" && (
             <>
-              <Row label="Balance"><span className="text-[14px] tabular-nums">{formatUsdPrecise(deepseek.totalMicro)}</span></Row>
+              <ListRow label="Balance"><span className="text-[14px] tabular-nums">{formatUsdPrecise(deepseek.totalMicro)}</span></ListRow>
               {deepseek.reconcile.started ? (
-                <Row label="Since"><span className="subhead">Starting point saved — the comparison appears after the next calls.</span></Row>
+                <ListRow label="Since"><span className="subhead">Starting point saved — the comparison appears after the next calls.</span></ListRow>
               ) : (
                 <>
-                  <Row label={`Real spend since ${shortDate(deepseek.reconcile.sinceMs)}`}>
+                  <ListRow label={`Real spend since ${shortDate(deepseek.reconcile.sinceMs)}`}>
                     <span className="text-[14px] tabular-nums">{formatUsdPrecise(deepseek.reconcile.realMicro)}</span>
-                  </Row>
-                  <Row label="Recorded by DataTube">
+                  </ListRow>
+                  <ListRow label="Recorded by DataTube">
                     <span className="text-[14px] tabular-nums">{formatUsdPrecise(deepseek.reconcile.estimatedMicrousd)}</span>
-                  </Row>
-                  <Row label="Difference" helper="A gap means a call was billed but not recorded, or a price in the table is off.">
-                    <span className="text-[14px] tabular-nums">
-                      {deepseek.reconcile.realMicro - deepseek.reconcile.estimatedMicrousd < 0 ? "-" : ""}
-                      {formatUsdPrecise(Math.abs(deepseek.reconcile.realMicro - deepseek.reconcile.estimatedMicrousd))}
-                    </span>
-                  </Row>
+                  </ListRow>
+                  <ListRow label="Difference" helper="A gap means a call was billed but not recorded, or a price in the table is off.">
+                    <span className="text-[14px] tabular-nums">{formatUsdPrecise(deepseek.reconcile.realMicro - deepseek.reconcile.estimatedMicrousd)}</span>
+                  </ListRow>
                 </>
               )}
             </>

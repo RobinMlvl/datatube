@@ -23,9 +23,9 @@ export default async function LibraryPage({ searchParams }) {
   const videos = listVideos(db, { themeId, state, q });
   const counts = libraryCounts(db);
   // eslint-disable-next-line react-hooks/purity -- Server Component rendered at request time, after connection()
-  const queue = queueStatus(db, Date.now());
-  // eslint-disable-next-line react-hooks/purity -- Server Component rendered at request time, after connection()
-  const budget = budgetStatus(db, Date.now());
+  const now = Date.now();
+  const queue = queueStatus(db, now);
+  const budget = budgetStatus(db, now);
   const href = (s) => {
     const p = new URLSearchParams();
     if (themeId) p.set("theme", String(themeId));
