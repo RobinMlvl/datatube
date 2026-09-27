@@ -24,6 +24,7 @@ export default function ReviewItem({ video, themes }) {
           ? `Jev's best existing theme was only ${Math.round(video.confidencePermille / 10)}% sure`
           : "No theme existed yet"}
       </p>
+      {video.summary && <p className="mt-3 max-w-3xl text-[14px] leading-relaxed text-label">{video.summary}</p>}
       <p className="eyebrow mt-4 mb-2">Proposed theme</p>
       <div className="flex flex-wrap items-center gap-2">
         <input

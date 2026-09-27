@@ -23,7 +23,7 @@ export default async function ReviewPage() {
         <ul className="mt-6 space-y-3">
           {items.map((v) => (
             <li key={v.id}>
-              <ReviewItem video={{ id: v.id, title: v.title, channel: v.channel, proposal: v.proposal, confidencePermille: v.classifyConfidence }} themes={themes} />
+              <ReviewItem video={{ id: v.id, title: v.title, channel: v.channel, proposal: v.proposal, confidencePermille: v.classifyConfidence, summary: v.summary }} themes={themes} />
             </li>
           ))}
         </ul>

@@ -46,19 +46,19 @@ server.registerTool("search", {
 
 server.registerTool("get_video_sheet", {
   title: "Read a video's knowledge sheet",
-  description: "One video's sheet: core idea, chapters, key points and practical steps, every point cited as [MM:SS] \"exact words\" from the transcript.",
+  description: "One video's revision sheet: a short summary, the key takeaways and the method (steps, rules, numbers, settings), condensed from the transcript only.",
   inputSchema: { videoId: VideoId },
 }, reply(videoSheetText));
 
 server.registerTool("get_theme_sheet", {
   title: "Read a theme's consolidated sheet",
-  description: "The consolidated sheet of a theme — knowledge merged across its videos, cited as [Video title · MM:SS], disagreements listed — plus its videos. Give themeId, or name as \"Parent › Child\" or just the name.",
+  description: "The consolidated revision sheet of a theme — the useful data merged across its videos, disagreements between videos listed by title — plus its videos. Give themeId, or name as \"Parent › Child\" or just the name.",
   inputSchema: { themeId: z.number().int().optional(), name: z.string().optional() },
 }, reply(themeSheetText));
 
 server.registerTool("get_transcript", {
   title: "Read a transcript",
-  description: "A video's timestamped transcript, whole or between two timestamps — to check the exact wording behind a sheet's citation.",
+  description: "A video's timestamped transcript, whole or between two timestamps — to check the exact wording behind a point of a sheet.",
   inputSchema: { videoId: VideoId, from: Stamp.optional(), to: Stamp.optional() },
 }, reply(transcriptRangeText));
 
