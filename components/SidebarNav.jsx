@@ -20,7 +20,7 @@ export default function SidebarNav({ counts, variant = "desktop" }) {
 
   if (variant === "mobile") {
     return (
-      <nav aria-label="Primary" className="flex gap-1 overflow-x-auto pb-2">
+      <nav aria-label="Primary" className="flex gap-1 overflow-x-auto pb-2 [scrollbar-width:none]">
         {ITEMS.map(({ href, label, countKey }) => {
           const active = isActive(pathname, href);
           const count = countKey ? counts[countKey] : null;

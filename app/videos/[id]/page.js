@@ -66,10 +66,10 @@ export default async function VideoPage({ params }) {
           </a>
         )}
         {video.transcript && !busy && (
-          <ActionButton action={regenerateSummaryAction.bind(null, video.id)} label="Regenerate summary" pendingLabel="Queuing…" icon={RefreshCw} />
+          <ActionButton action={regenerateSummaryAction.bind(null, video.id)} label="Regenerate summary" pendingLabel="Queuing…" icon={<RefreshCw aria-hidden="true" />} />
         )}
         {["failed", "no_transcript"].includes(video.state) && (
-          <ActionButton action={retryVideoAction.bind(null, video.id)} label="Retry" pendingLabel="Queuing…" variant="primary" icon={RotateCcw} />
+          <ActionButton action={retryVideoAction.bind(null, video.id)} label="Retry" pendingLabel="Queuing…" variant="primary" icon={<RotateCcw aria-hidden="true" />} />
         )}
         <a href={video.url} target="_blank" rel="noreferrer" className="btn btn-plain">
           <ArrowUpRight aria-hidden="true" />

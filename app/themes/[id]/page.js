@@ -40,7 +40,7 @@ export default async function ThemePage({ params }) {
         Library
       </Link>
       <h1 className="large-title mt-3">{theme.path}</h1>
-      <p className={`status ${statusClass} mt-2`}>{statusText}</p>
+      <p className={`status ${statusClass} mt-2 whitespace-normal`}>{statusText}</p>
       <div className="mt-5 flex flex-wrap items-center gap-2">
         {summarized > 0
           ? (
@@ -49,7 +49,7 @@ export default async function ThemePage({ params }) {
               label={theme.sheetMarkdown ? "Regenerate sheet" : "Write the sheet"}
               pendingLabel="Writing the sheet…"
               variant="primary"
-              icon={RefreshCw}
+              icon={<RefreshCw aria-hidden="true" />}
             />
           )
           : <span className="subhead">No summarized video in this theme yet.</span>}
