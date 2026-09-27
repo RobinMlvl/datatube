@@ -14,7 +14,11 @@ const SettingsForm = z.object({
 export async function saveSettingsAction(_prev, formData) {
   const parsed = SettingsForm.safeParse({ deepseekModel: formData.get("deepseekModel"), thresholdPercent: formData.get("thresholdPercent") });
   if (!parsed.success) return { ok: false, error: "The threshold is a whole percentage between 0 and 100." };
-  writeSettings(getDb(), { deepseekModel: parsed.data.deepseekModel, jevThresholdPermille: parsed.data.thresholdPercent * 10 });
+  try {
+    writeSettings(getDb(), { deepseekModel: parsed.data.deepseekModel, jevThresholdPermille: parsed.data.thresholdPercent * 10 });
+  } catch (err) {
+    return { ok: false, error: String(err?.message ?? err).slice(0, 300) };
+  }
   revalidatePath("/settings");
   return { ok: true };
 }
