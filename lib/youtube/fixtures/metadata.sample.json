@@ -1,0 +1,16 @@
+{
+  "id": "dQw4w9WgXcQ",
+  "title": "Breakout trading strategy explained",
+  "channel": "Trader Joe",
+  "uploader": "Trader Joe",
+  "channel_id": "UC1234567890abcdefghijk",
+  "duration": 3753.4,
+  "upload_date": "20260412",
+  "language": "en",
+  "chapters": [
+    { "start_time": 0.0, "end_time": 95.0, "title": "Intro" },
+    { "start_time": 95.0, "end_time": 3753.0, "title": "The setup" }
+  ],
+  "subtitles": { "live_chat": [{ "ext": "json" }], "fr": [{ "ext": "vtt" }] },
+  "automatic_captions": { "en-orig": [{ "ext": "vtt" }], "en": [{ "ext": "vtt" }], "fr": [{ "ext": "vtt" }], "de": [{ "ext": "vtt" }] }
+}

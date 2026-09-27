@@ -1,0 +1,13 @@
+{
+  "_type": "playlist",
+  "id": "PLabc_123",
+  "title": "Breakout course",
+  "entries": [
+    { "_type": "url", "ie_key": "Youtube", "id": "dQw4w9WgXcQ", "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "title": "Part 1" },
+    { "_type": "url", "ie_key": "Youtube", "id": "aaaaaaaaaaa", "url": "https://www.youtube.com/watch?v=aaaaaaaaaaa", "title": "[Private video]" },
+    { "_type": "playlist", "title": "Nested tab", "entries": [
+      { "_type": "url", "ie_key": "Youtube", "id": "bbbbbbbbbbb", "url": "https://www.youtube.com/watch?v=bbbbbbbbbbb", "title": "Part 2" }
+    ] },
+    { "_type": "url", "ie_key": "YoutubeTab", "id": "UC1234567890abcdefghijk", "url": "https://www.youtube.com/channel/UC1234567890abcdefghijk/shorts", "title": "Shorts" }
+  ]
+}
