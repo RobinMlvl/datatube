@@ -2,10 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { Trash2 } from "lucide-react";
 import { deleteThemeAction, renameThemeAction, setThemeParentAction } from "@/app/actions/themes";
-
-const BUTTON = "rounded-md border border-neutral-300 bg-white px-3 py-1.5 hover:bg-neutral-50 disabled:opacity-50";
-const FIELD = "rounded-md border border-neutral-300 px-2 py-1.5";
 
 export default function ThemeAdmin({ theme, parents, canHaveParent, canDelete }) {
   const router = useRouter();
@@ -20,24 +18,64 @@ export default function ThemeAdmin({ theme, parents, canHaveParent, canDelete })
     else after?.();
   });
   return (
-    <div className="space-y-3 text-sm">
-      <div className="flex flex-wrap items-center gap-2">
-        <input value={name} onChange={(e) => setName(e.target.value)} className={`${FIELD} w-56`} />
-        <button type="button" disabled={pending || !name.trim() || name === theme.name} onClick={() => run(() => renameThemeAction(theme.id, name))} className={BUTTON}>Rename</button>
-      </div>
-      {canHaveParent && (
-        <div className="flex flex-wrap items-center gap-2">
-          <select value={parentId} onChange={(e) => setParentId(e.target.value)} className={FIELD}>
-            <option value="">No parent</option>
-            {parents.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-          </select>
-          <button type="button" disabled={pending} onClick={() => run(() => setThemeParentAction(theme.id, parentId ? Number(parentId) : null))} className={BUTTON}>Set parent</button>
+    <div className="card">
+      <div className="rows">
+        <div className="flex flex-wrap items-center gap-3 px-4 py-3">
+          <span className="w-24 text-[13px] text-label-2">Name</span>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            aria-label="Theme name"
+            className="field w-56"
+          />
+          <button
+            type="button"
+            disabled={pending || !name.trim() || name === theme.name}
+            onClick={() => run(() => renameThemeAction(theme.id, name))}
+            className="btn btn-secondary"
+          >
+            Rename
+          </button>
         </div>
-      )}
-      {canDelete && (
-        <button type="button" disabled={pending} onClick={() => run(() => deleteThemeAction(theme.id), () => router.push("/"))} className={BUTTON}>Delete this empty theme</button>
-      )}
-      {error && <p className="text-red-700">{error}</p>}
+        {canHaveParent && (
+          <div className="flex flex-wrap items-center gap-3 px-4 py-3">
+            <span className="w-24 text-[13px] text-label-2">Parent</span>
+            <select
+              value={parentId}
+              onChange={(e) => setParentId(e.target.value)}
+              aria-label="Parent theme"
+              className="field"
+            >
+              <option value="">No parent</option>
+              {parents.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => run(() => setThemeParentAction(theme.id, parentId ? Number(parentId) : null))}
+              className="btn btn-secondary"
+            >
+              Set parent
+            </button>
+          </div>
+        )}
+        {canDelete && (
+          <div className="flex flex-wrap items-center gap-3 px-4 py-3">
+            <span className="w-24 text-[13px] text-label-2">Delete</span>
+            <span className="subhead">Only an empty theme can be deleted.</span>
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => run(() => deleteThemeAction(theme.id), () => router.push("/"))}
+              className="btn btn-destructive"
+            >
+              <Trash2 aria-hidden="true" />
+              Delete theme
+            </button>
+          </div>
+        )}
+        {error && <p className="px-4 py-3 text-[13px] text-negative" role="alert">{error}</p>}
+      </div>
     </div>
   );
 }

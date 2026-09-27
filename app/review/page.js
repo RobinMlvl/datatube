@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { CheckCircle2 } from "lucide-react";
 import ReviewItem from "@/components/ReviewItem";
 import { getDb } from "@/lib/db.mjs";
 import { reviewQueue, themeOptions } from "@/lib/queries.mjs";
@@ -9,11 +10,15 @@ export default async function ReviewPage() {
   const items = reviewQueue(db);
   const themes = themeOptions(db);
   return (
-    <div className="mx-auto max-w-4xl">
-      <h1 className="text-2xl font-semibold tracking-tight">To review</h1>
-      <p className="mt-1 text-sm text-neutral-500">Jev could not place these videos with enough confidence. DeepSeek proposes a theme: accept it, rename it, or pick an existing one.</p>
+    <div className="mx-auto max-w-5xl">
+      <h1 className="large-title">To review</h1>
+      <p className="subhead mt-2">Jev could not place these videos with enough confidence. DeepSeek proposes a theme: accept it, rename it, or pick an existing one.</p>
       {items.length === 0 ? (
-        <p className="mt-8 text-sm text-neutral-500">Nothing to review.</p>
+        <div className="card mt-8 flex flex-col items-center gap-2 p-8 text-center">
+          <CheckCircle2 size={28} className="text-positive" aria-hidden="true" />
+          <p className="headline">All sorted</p>
+          <p className="subhead">Nothing waits for a theme.</p>
+        </div>
       ) : (
         <ul className="mt-6 space-y-3">
           {items.map((v) => (
