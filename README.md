@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# DataTube
 
-## Getting Started
+A local library of knowledge sheets built from YouTube videos.
 
-First, run the development server:
+Paste videos, playlists or channels. DataTube fetches each transcript (yt-dlp), writes a sheet (DeepSeek) where every point is cited as `[MM:SS] "exact words"`, sorts the video into a theme (Jev), and merges a theme's videos into one consolidated sheet. Export any sheet as Markdown, or let Claude Code read the library through the MCP server.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Setup (once)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. `brew install yt-dlp deno`
+2. `npm install`
+3. `cp .env.example .env.local`, then fill in `DEEPSEEK_API_KEY` and `TYPESAFE_API_KEY`
+4. `npm run dev` — the app on http://localhost:3000 and the worker, together (the app listens on 127.0.0.1 only: its actions spend API credits)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Give the library to Claude Code
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+    claude mcp add datatube -- node /absolute/path/to/DataTube/mcp/server.mjs
 
-## Learn More
+Tools: `list_themes`, `search`, `get_video_sheet`, `get_theme_sheet`, `get_transcript`.
 
-To learn more about Next.js, take a look at the following resources:
+## Where things live
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The library is one file: `data/datatube.db` (back it up by copying it).
+- Spec: `docs/superpowers/specs/2026-09-27-datatube-design.md`
+- The method it comes from: `docs/reference/ytquest/`
