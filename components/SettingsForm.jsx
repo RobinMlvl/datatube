@@ -37,6 +37,23 @@ export default function SettingsForm({ models, settings }) {
         </span>
       </div>
       <div className="flex items-center justify-between gap-4 px-4 py-3">
+        <div>
+          <label htmlFor="monthlyBudget" className="text-[14px]">Monthly budget</label>
+          <p className="subhead">Summaries and sorting pause when this month&apos;s spend reaches it. Leave empty for no budget.</p>
+        </div>
+        <span className="flex items-center gap-1.5">
+          <span className="text-[14px] text-label-2">$</span>
+          <input
+            id="monthlyBudget"
+            type="text"
+            inputMode="decimal"
+            name="monthlyBudget"
+            defaultValue={settings.monthlyBudgetMicrousd != null ? settings.monthlyBudgetMicrousd / 1_000_000 : ""}
+            className="field w-28 text-right tabular-nums"
+          />
+        </span>
+      </div>
+      <div className="flex items-center justify-between gap-4 px-4 py-3">
         <span aria-live="polite">
           {state?.ok && (
             <span className="inline-flex items-center gap-1.5 text-[13px] text-positive">

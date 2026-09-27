@@ -1,4 +1,5 @@
 import path from "node:path";
+import Link from "next/link";
 import { connection } from "next/server";
 import CopyButton from "@/components/CopyButton";
 import SettingsForm from "@/components/SettingsForm";
@@ -81,6 +82,9 @@ export default async function SettingsPage() {
           <Row label="All time">
             <span className="text-[14px] tabular-nums">{formatUsd(costs.allMicrousd)}</span>
           </Row>
+          <div className="px-4 py-3">
+            <Link href="/spend" className="btn btn-plain -ml-2">See all spending</Link>
+          </div>
         </div>
       </section>
 

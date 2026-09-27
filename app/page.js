@@ -2,9 +2,11 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Clock, Search } from "lucide-react";
 import AutoRefresh from "@/components/AutoRefresh";
+import BudgetBanner from "@/components/BudgetBanner";
 import ImportForm from "@/components/ImportForm";
 import ThemeFilter from "@/components/ThemeFilter";
 import VideosTable from "@/components/VideosTable";
+import { budgetStatus } from "@/lib/budget.mjs";
 import { getDb } from "@/lib/db.mjs";
 import { libraryCounts, listVideos, queueStatus, themeOptions } from "@/lib/queries.mjs";
 
@@ -22,6 +24,8 @@ export default async function LibraryPage({ searchParams }) {
   const counts = libraryCounts(db);
   // eslint-disable-next-line react-hooks/purity -- Server Component rendered at request time, after connection()
   const queue = queueStatus(db, Date.now());
+  // eslint-disable-next-line react-hooks/purity -- Server Component rendered at request time, after connection()
+  const budget = budgetStatus(db, Date.now());
   const href = (s) => {
     const p = new URLSearchParams();
     if (themeId) p.set("theme", String(themeId));
@@ -47,6 +51,9 @@ export default async function LibraryPage({ searchParams }) {
           </p>
         </div>
       )}
+      <div className="mt-4">
+        <BudgetBanner budget={budget} />
+      </div>
       <div className="mt-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="max-w-full overflow-x-auto [scrollbar-width:none]">
           <div className="segmented">
