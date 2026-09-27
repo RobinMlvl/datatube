@@ -3,9 +3,10 @@ import { connection } from "next/server";
 import { Clock, Search } from "lucide-react";
 import AutoRefresh from "@/components/AutoRefresh";
 import ImportForm from "@/components/ImportForm";
+import ThemeFilter from "@/components/ThemeFilter";
 import VideosTable from "@/components/VideosTable";
 import { getDb } from "@/lib/db.mjs";
-import { libraryCounts, listVideos, queueStatus } from "@/lib/queries.mjs";
+import { libraryCounts, listVideos, queueStatus, themeOptions } from "@/lib/queries.mjs";
 
 const FILTERS = [["All", null], ["In progress", "active"], ["Done", "done"], ["To review", "review"], ["No transcript", "no_transcript"], ["Failed", "failed"]];
 
@@ -15,12 +16,15 @@ export default async function LibraryPage({ searchParams }) {
   const db = getDb();
   const state = typeof sp.state === "string" ? sp.state : null;
   const q = typeof sp.q === "string" ? sp.q : "";
-  const videos = listVideos(db, { state, q });
+  const themes = themeOptions(db);
+  const themeId = themes.find((t) => String(t.id) === sp.theme)?.id ?? null;
+  const videos = listVideos(db, { themeId, state, q });
   const counts = libraryCounts(db);
   // eslint-disable-next-line react-hooks/purity -- Server Component rendered at request time, after connection()
   const queue = queueStatus(db, Date.now());
   const href = (s) => {
     const p = new URLSearchParams();
+    if (themeId) p.set("theme", String(themeId));
     if (s) p.set("state", s);
     if (q) p.set("q", q);
     const qs = p.toString();
@@ -44,7 +48,7 @@ export default async function LibraryPage({ searchParams }) {
         </div>
       )}
       <div className="mt-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="max-w-full overflow-x-auto">
+        <div className="max-w-full overflow-x-auto [scrollbar-width:none]">
           <div className="segmented">
             {FILTERS.map(([label, s]) => (
               <Link key={label} href={href(s)} aria-current={state === s ? "page" : undefined} className="segment">
@@ -53,15 +57,19 @@ export default async function LibraryPage({ searchParams }) {
             ))}
           </div>
         </div>
-        <form action="/" className="relative w-full md:w-72">
-          {state && <input type="hidden" name="state" value={state} />}
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-label-3" />
-          <input
-            type="search" name="q" defaultValue={q} placeholder="Search"
-            aria-label="Search titles, sheets and transcripts"
-            className="field w-full pl-8"
-          />
-        </form>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+          {themes.length > 0 && <ThemeFilter themes={themes} themeId={themeId} state={state} q={q} />}
+          <form action="/" className="relative w-full md:w-64">
+            {themeId && <input type="hidden" name="theme" value={themeId} />}
+            {state && <input type="hidden" name="state" value={state} />}
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-label-3" />
+            <input
+              type="search" name="q" defaultValue={q} placeholder="Search"
+              aria-label="Search titles, sheets and transcripts"
+              className="field w-full pl-8"
+            />
+          </form>
+        </div>
       </div>
       <div className="mt-6">
         <VideosTable videos={videos} />
