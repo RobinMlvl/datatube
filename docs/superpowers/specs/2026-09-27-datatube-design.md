@@ -88,13 +88,13 @@ Les états d'une `Video` : `queued` → `fetching` → `summarizing` → `classi
 
 ### 5.2 Transcript (`fetch`)
 - `yt-dlp -J --skip-download <url>` donne les métadonnées : titre, chaîne, durée, date, chapitres, et les listes `subtitles` / `automatic_captions`.
-- **Ordre de choix de la piste :**
+- **Ordre de choix de la piste** (les citations exactes viennent de la langue PARLÉE, jamais d'une traduction automatique) :
   1. sous-titres manuels dans la langue d'origine de la vidéo ;
-  2. manuels FR ;
-  3. manuels EN ;
-  4. auto FR ;
-  5. auto EN ;
-  6. n'importe quelle piste.
+  2. sous-titres auto dans la langue d'origine (la piste `<langue>-orig` quand yt-dlp la nomme ainsi) ;
+  3. manuels FR, puis manuels EN ;
+  4. langue d'origine inconnue seulement : auto FR, puis auto EN ;
+  5. le premier sous-titre manuel, puis la piste auto d'origine.
+  Une piste qui répond 429 passe à la suivante.
 - Téléchargement : `yt-dlp --skip-download --write-subs|--write-auto-subs --sub-langs <code> --sub-format vtt -o <tmp>/%(id)s`, puis parsing (§2).
 - Si le FR répond HTTP 429, on essaie tout de suite l'EN (règle ytquest : le 429 de timedtext est par langue).
 - Aucune piste → état `no_transcript`. La vidéo reste visible, sans résumé, et le bouton Retry reste possible.
