@@ -1,5 +1,7 @@
 // The worker: one job at a time, forever, until Ctrl-C. Run with `npm run worker` (or `npm run dev`).
 import fs from "node:fs";
+import { paidStepsAllowed } from "../lib/budget.mjs";
+import { costSince, formatUsdPrecise, lastApiCallId } from "../lib/costs.mjs";
 import { dbPath, openDb } from "../lib/db.mjs";
 import { claimNext, completeJob, recoverRunning } from "../lib/jobs.mjs";
 import { handleFailure } from "../lib/pipeline/failures.mjs";
@@ -39,22 +41,36 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
 }
 
 let lastYoutubeAt = 0;
+let budgetHeld = false;
 console.log("[worker] ready");
 while (!stopping) {
-  const job = claimNext(db, Date.now());
+  // The monthly budget is checked before each job: reached, only the free YouTube steps run.
+  const paid = paidStepsAllowed(db, Date.now());
+  if (paid === budgetHeld) {
+    budgetHeld = !paid;
+    console.log(budgetHeld
+      ? "[worker] monthly budget reached — summaries and sorting wait (raise it in Settings)"
+      : "[worker] under the monthly budget — summaries and sorting resume");
+  }
+  const job = claimNext(db, Date.now(), { paid });
   if (!job) { await sleep(IDLE_MS); continue; }
   if (job.step === "fetch") {
     const wait = lastYoutubeAt + YOUTUBE_GAP_MS - Date.now();
     if (wait > 0) await sleep(wait);
   }
   const started = Date.now();
+  const mark = lastApiCallId(db);
+  const spent = () => {
+    const micro = costSince(db, mark, job.videoId);
+    return micro ? ` · ${formatUsdPrecise(micro)}` : "";
+  };
   try {
     await steps.run(job);
     completeJob(db, job.id, Date.now());
-    console.log(`[worker] ${job.step} ${job.videoId} done in ${((Date.now() - started) / 1000).toFixed(1)}s`);
+    console.log(`[worker] ${job.step} ${job.videoId} done in ${((Date.now() - started) / 1000).toFixed(1)}s${spent()}`);
   } catch (err) {
     const outcome = handleFailure(db, job, err, Date.now());
-    console.log(`[worker] ${job.step} ${job.videoId} ${outcome}: ${String(err?.message ?? err).slice(0, 200)}`);
+    console.log(`[worker] ${job.step} ${job.videoId} ${outcome}${spent()}: ${String(err?.message ?? err).slice(0, 200)}`);
   } finally {
     if (job.step === "fetch") lastYoutubeAt = Date.now();
   }

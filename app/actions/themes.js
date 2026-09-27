@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { budgetStatus } from "@/lib/budget.mjs";
+import { formatUsd } from "@/lib/costs.mjs";
 import { getDb } from "@/lib/db.mjs";
 import { createLivePipeline } from "@/lib/pipeline/live.mjs";
 import { buildThemeSheet, saveThemeSheet } from "@/lib/pipeline/themeSheet.mjs";
@@ -18,6 +20,10 @@ export async function regenerateThemeSheetAction(themeId) {
     const db = getDb();
     const theme = getTheme(db, id);
     if (!theme) return { ok: false, error: "Unknown theme." };
+    const budget = budgetStatus(db, Date.now());
+    if (budget.level === "reached") {
+      return { ok: false, error: `Monthly budget reached (${formatUsd(budget.spentMicrousd)} of ${formatUsd(budget.budgetMicrousd)}) — raise it in Settings.` };
+    }
     const { deepseekModel } = readSettings(db);
     const { deepseek } = createLivePipeline(db);
     const markdown = await buildThemeSheet({
