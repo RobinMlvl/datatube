@@ -10,7 +10,7 @@ import ThemeAdmin from "@/components/ThemeAdmin";
 import VideosTable from "@/components/VideosTable";
 import { getDb } from "@/lib/db.mjs";
 import { themeSheetFile } from "@/lib/export.mjs";
-import { getTheme, themeTree, themeVideosWithSummaries } from "@/lib/queries.mjs";
+import { getTheme, listVideos, themeTree, themeVideosWithSummaries } from "@/lib/queries.mjs";
 
 export default async function ThemePage({ params }) {
   await connection();
@@ -19,6 +19,7 @@ export default async function ThemePage({ params }) {
   const theme = getTheme(db, Number(id));
   if (!theme) notFound();
   const summarized = themeVideosWithSummaries(db, theme.id).filter((v) => v.summary).length;
+  const videos = listVideos(db, { themeId: theme.id }); // a parent lists its sub-themes' videos too
   const file = theme.sheetMarkdown
     ? themeSheetFile({ path: theme.path, sheetMarkdown: theme.sheetMarkdown, model: theme.sheetModel, generatedAt: theme.sheetGeneratedAt, videoCount: theme.videos.length })
     : null;
@@ -67,6 +68,9 @@ export default async function ThemePage({ params }) {
           </a>
         )}
       </div>
+      {theme.children.length > 0 && summarized > 0 && (
+        <p className="subhead mt-2">The sheet covers the videos filed directly in {theme.name}; each sub-theme has its own.</p>
+      )}
       {theme.children.length > 0 && (
         <div className="mt-5 flex flex-wrap gap-2">
           {theme.children.map((c) => (
@@ -82,8 +86,8 @@ export default async function ThemePage({ params }) {
           <Markdown markdown={theme.sheetMarkdown.replace(/^# [^\n]*\n+/, "")} />
         </article>
       )}
-      <h2 className="title-2 mt-10 mb-3">Videos</h2>
-      <VideosTable videos={theme.videos} empty="No video filed directly in this theme." />
+      <h2 className="title-2 mt-10 mb-3">Videos <span className="tabular-nums text-label-2">{videos.length}</span></h2>
+      <VideosTable videos={videos} empty="No video in this theme yet." />
       <h2 className="title-2 mt-10 mb-3">Manage</h2>
       <ThemeAdmin
         theme={{ id: theme.id, name: theme.name, parentId: theme.parentId }}
