@@ -40,8 +40,8 @@ export default function VideosTable({ videos, empty = "No video here yet. Paste 
                     <span className="text-label-3">—</span>
                   )}
                 </td>
-                <td className="px-4 py-2"><StateBadge state={v.state} themeSource={v.themeSource} /></td>
-                <td className="px-4 py-2 text-right tabular-nums text-label-2">{formatUsd(v.costMicrousd)}</td>
+                <td className="whitespace-nowrap px-4 py-2"><StateBadge state={v.state} themeSource={v.themeSource} /></td>
+                <td className="whitespace-nowrap px-4 py-2 text-right tabular-nums text-label-2">{formatUsd(v.costMicrousd)}</td>
               </tr>
             ))}
           </tbody>
