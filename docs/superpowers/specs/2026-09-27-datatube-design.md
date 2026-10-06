@@ -16,7 +16,7 @@ On y colle des liens YouTube : des vidéos, une playlist ou une chaîne entière
 
 ## 2. D'où vient la méthode
 
-Elle vient du profil Hermes **ytquest** (VPS Dewex), copié tel quel dans `docs/reference/ytquest/`, sans cookies ni secrets. On en garde quatre choses :
+Elle vient du profil Hermes **ytquest** (VPS Dewex), dont `docs/reference/ytquest/` garde les fichiers de la méthode : `SOUL.md`, `parse_vtt.py`, `vtt-parsing.md` et `summary-format-example.md`. On en garde quatre choses :
 
 - **Les règles anti-hallucination du SOUL :**
   - le transcript est la seule source ;
